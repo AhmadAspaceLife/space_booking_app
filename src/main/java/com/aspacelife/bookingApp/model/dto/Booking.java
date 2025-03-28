@@ -1,8 +1,8 @@
-package com.aspacelife.bookingApp;
+package com.aspacelife.bookingApp.model.dto;
 
 import java.time.LocalDateTime;
 
-import io.vertx.core.json.JsonObject;
+import com.aspacelife.bookingApp.BookingStatus;
 
 /**
  * @author AHMAD BUBA

@@ -1,4 +1,4 @@
-package com.aspacelife.bookingApp;
+package com.aspacelife.bookingApp.model.dto;
 
 import io.vertx.core.json.JsonObject;
 
@@ -8,7 +8,10 @@ import io.vertx.core.json.JsonObject;
  * Time:11:41
  */
 
+
+/* convert to immutable */
 public class Space {
+
   private final String id;
   private final String name;
   private boolean available;

@@ -3,6 +3,8 @@ package com.aspacelife.bookingApp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.aspacelife.bookingApp.model.dto.Booking;
+import com.aspacelife.bookingApp.model.dto.Space;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Time:12:39
  */
 
-public class BookingTests {
+class BookingTests {
+
   private final Space spaceA = new Space(UUID.randomUUID().toString(),"spaceA", true);
   private final Space spaceB = new Space(UUID.randomUUID().toString(),"spaceB", true);
 

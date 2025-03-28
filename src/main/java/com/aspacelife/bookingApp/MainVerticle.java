@@ -10,8 +10,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
+import com.aspacelife.bookingApp.config.ServerConfigProps;
+import com.aspacelife.bookingApp.model.dto.Booking;
+import com.aspacelife.bookingApp.model.dto.Space;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.impl.logging.Logger;
@@ -21,9 +23,16 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+/* improve code with design patterns and solid principle  */
+@Component
+@RequiredArgsConstructor
 public class MainVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LoggerFactory.getLogger(MainVerticle.class);
+  private final Router router;
+  private final ServerConfigProps configProps;
 
   private final Set<String> users =  new HashSet<>();
   private final Set<Space> spaces = ConcurrentHashMap.newKeySet();
@@ -31,19 +40,17 @@ public class MainVerticle extends AbstractVerticle {
 
   @Override
   public void start(final Promise<Void> startPromise) {
-    final Router router = Router.router(this.vertx);
 
     this.vertx.createHttpServer()
               .requestHandler(router)
-              .listen(8888)
+              .listen(this.configProps.getPort())
               .onSuccess(ok -> {
-                LOGGER.info("HTTP server running: http://127.0.0.1:" + 8888);
+                LOGGER.info("HTTP server running: http://127.0.0.1:" + configProps.getPort());
                 startPromise.complete();
               })
               .onFailure(startPromise::fail);
 
     router.post("/users").handler(BodyHandler.create()).handler(this::createUser);
-    router.get("/users").handler(this::getUsers);
     router.get("/spaces").handler(this::getSpaces);
     router.post("/spaces").handler(BodyHandler.create()).handler(this::createSpace);
     router.get("/spaces/:name").handler(this::getSpaceByName);
@@ -57,6 +64,7 @@ public class MainVerticle extends AbstractVerticle {
 
 
   private void createUser(final RoutingContext context) {
+    /* wrong {wrap in try and catch ???[what if user send multipart]} */
     final JsonObject body = context.body().asJsonObject();
     if (body == null) {
       context.response()
@@ -65,6 +73,7 @@ public class MainVerticle extends AbstractVerticle {
              .end(new JsonObject().put("error", "Invalid request body").encode());
       return;
     }
+
 
     final String username = body.getString("username");
 
@@ -90,48 +99,13 @@ public class MainVerticle extends AbstractVerticle {
   }
 
   private void getUsers(final RoutingContext context) {
-    final int page = this.parseQueryParam(context, "page", 1);
-    final int size = this.parseQueryParam(context, "size", 10);
 
-    if (page < 1 || size < 1) {
-      context.response()
-             .setStatusCode(400)
-             .putHeader("Content-Type", "application/json")
-             .end(new JsonObject().put("error", "Page and size must be greater than 0").encode());
-      return;
-    }
-
-    final List<String> sortedUsers = this.users.stream()
-                                               .sorted()
-                                               .collect(Collectors.toList());
-
-    final int fromIndex = (page - 1) * size;
-    final int toIndex = Math.min(fromIndex + size, sortedUsers.size());
-
-    if (fromIndex >= sortedUsers.size()) {
-      context.response()
-             .setStatusCode(400)
-             .putHeader("Content-Type", "application/json")
-             .end(new JsonObject().put("error", "No users found for the given page").encode());
-      return;
-    }
-
-    final List<String> paginatedUsers = sortedUsers.subList(fromIndex, toIndex);
-
-    final JsonObject response = new JsonObject()
-                            .put("page", page)
-                            .put("size", size)
-                            .put("totalUsers", this.users.size())
-                            .put("totalPages", (int) Math.ceil((double) this.users.size() / size))
-                            .put("users", new JsonArray(paginatedUsers));
-
-    context.response()
-           .putHeader("Content-Type", "application/json")
-           .end(response.encode());
   }
 
 
   private void createBooking(final RoutingContext context) {
+
+    /* wrong */
     final JsonObject body = context.body().asJsonObject();
 
     if (body == null) {
@@ -151,6 +125,7 @@ public class MainVerticle extends AbstractVerticle {
     if (username == null || username.isBlank() || spaceName == null || spaceName.isBlank() || startTimeStr == null || startTimeStr.isBlank() || endTimeStr == null || endTimeStr.isBlank()) {
       context.response()
              .setStatusCode(400)
+        /* create static content-type */
              .putHeader("Content-Type", "application/json")
              .end(new JsonObject().put("error", "Invalid payload, please check username, spacename, startime and endtime have been passed properly").encode());
       return;
@@ -166,6 +141,7 @@ public class MainVerticle extends AbstractVerticle {
     } catch (final DateTimeParseException e) {
       context.response()
              .setStatusCode(400)
+        /* create static content-type */
              .putHeader("Content-Type", "application/json")
              .end(new JsonObject().put("error", "Invalid date format").encode());
       return;
@@ -192,6 +168,7 @@ public class MainVerticle extends AbstractVerticle {
     if (spaceOptional.isEmpty()) {
       context.response()
              .setStatusCode(409)
+        /* create static content-type */
              .putHeader("Content-Type", "application/json")
              .end(new JsonObject().put("error", "No such space").encode());
       return;
@@ -203,6 +180,7 @@ public class MainVerticle extends AbstractVerticle {
 
     for (final Booking existing : this.bookings) {
       if (newBooking.overlapsWith(existing)) {
+        /* wrong [return custom error not crash the server ] */
         throw new IllegalStateException("Booking conflicts with an existing reservation.");
       }
     }
