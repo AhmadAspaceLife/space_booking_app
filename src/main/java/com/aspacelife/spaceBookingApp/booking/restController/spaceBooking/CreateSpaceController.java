@@ -1,4 +1,4 @@
-package com.aspacelife.spaceBookingApp.booking.restController.space;
+package com.aspacelife.spaceBookingApp.booking.restController.spaceBooking;
 
 import org.springframework.stereotype.Controller;
 
@@ -10,7 +10,6 @@ import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.rest.r
 import com.aspacelife.spaceBookingApp.common.util.RoutingContextUtil;
 
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;

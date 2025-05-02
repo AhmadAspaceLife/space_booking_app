@@ -51,8 +51,10 @@ public class DaoBooking implements DalBooking {
                                                    .filter(booking -> booking.getDate().isEqual(date))
                                                    .toList();
     final Booking newBooking = new Booking(userEmail, username, date, startTime, endTime, spaceName);
-    if (this.isOverlapping(newBooking, bookingForTheDay)) {
-      throw new BookingOverlapsException("Booking overlaps");
+    final Optional<Booking> overlappingBookingOp = this.isOverlapping(newBooking, bookingForTheDay);
+    if (overlappingBookingOp.isPresent()) {
+      final Booking overlappingBooking = overlappingBookingOp.get();
+      throw new BookingOverlapsException("Your booking overlaps with a booking starting at " + overlappingBooking.getStartTime() + " and ending at " + overlappingBooking.getEndTime());
     }
     this.dalSpace.addBookingForSpace(newBooking);
     this.bookings.add(newBooking);
@@ -97,12 +99,15 @@ public class DaoBooking implements DalBooking {
     final List<Booking> bookingForTheDay = Optional.ofNullable(space.getBookings())
                                                    .orElse(Set.of())
                                                    .stream()
-                                                   .filter(booking-> booking.getId().equals(theBooking.getId()) && booking.getDate().isEqual(date))
+                                                   .filter(booking-> booking.getDate().isEqual(date))
                                                    .toList();
-    theBooking.update(spaceName, date, startTime, endTime);
-    if (this.isOverlapping(theBooking, bookingForTheDay)) {
-      throw new BookingOverlapsException("Booking overlaps");
+    final Booking tempBooking = new Booking(null,null, date, startTime, endTime, spaceName);
+    final Optional<Booking> overlappingBookingOp = this.isOverlapping(tempBooking, bookingForTheDay);
+    if (overlappingBookingOp.isPresent()) {
+      final Booking overlappingBooking = overlappingBookingOp.get();
+      throw new BookingOverlapsException("Your booking overlaps with a booking starting at " + overlappingBooking.getStartTime() + " and ending at " + overlappingBooking.getEndTime());
     }
+    theBooking.update(tempBooking.getSpaceName(), tempBooking.getDate(), tempBooking.getStartTime(), tempBooking.getEndTime());
     return theBooking;
   }
 
@@ -111,10 +116,14 @@ public class DaoBooking implements DalBooking {
            !endTime.equals(LocalTime.MIDNIGHT.plusNanos(1)); // Should end at 00:00 or before
   }
 
-  private boolean isOverlapping(final Booking newBooking, final List<Booking> existingBookings) {
-    return existingBookings.stream()
-                           .anyMatch(b -> newBooking.getStartTime().isBefore(b.getEndTime()) &&
-                                          newBooking.getEndTime().isAfter(b.getStartTime()));
+  private Optional<Booking> isOverlapping(final Booking newBooking, final List<Booking> existingBookings) {
+    for (final Booking booking: existingBookings) {
+      if (newBooking.getStartTime().isBefore(booking.getEndTime()) &&
+          newBooking.getEndTime().isAfter(booking.getStartTime())) {
+        return Optional.of(booking);
+      }
+    }
+    return Optional.empty();
   }
 
 }

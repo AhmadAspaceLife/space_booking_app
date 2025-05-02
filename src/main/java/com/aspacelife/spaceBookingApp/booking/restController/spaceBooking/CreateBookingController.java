@@ -1,4 +1,4 @@
-package com.aspacelife.spaceBookingApp.booking.restController.space;
+package com.aspacelife.spaceBookingApp.booking.restController.spaceBooking;
 
 import org.springframework.stereotype.Controller;
 

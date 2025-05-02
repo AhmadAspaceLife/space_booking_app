@@ -1,15 +1,12 @@
-package com.aspacelife.spaceBookingApp.booking.restController.space;
+package com.aspacelife.spaceBookingApp.booking.restController.spaceBooking;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 
 import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.model.dal.DalSpace;
 import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.model.dto.Space;
-import com.aspacelife.spaceBookingApp.booking.core.userManagement.model.dto.User;
 import com.aspacelife.spaceBookingApp.common.util.RoutingContextUtil;
 
 import io.vertx.core.Handler;

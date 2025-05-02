@@ -1,4 +1,4 @@
-package com.aspacelife.spaceBookingApp.booking.restController.space;
+package com.aspacelife.spaceBookingApp.booking.restController.spaceBooking;
 
 import org.springframework.stereotype.Controller;
 
@@ -8,7 +8,6 @@ import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.except
 import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.exception.NoSuchSpaceException;
 import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.model.dal.DalBooking;
 import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.model.dto.Booking;
-import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.rest.dto.CreateSpaceDto;
 import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.rest.dto.UpdateBookingDto;
 import com.aspacelife.spaceBookingApp.booking.core.spaceBookingManagement.rest.resource.BookingResource;
 import com.aspacelife.spaceBookingApp.common.exception.NoSuchParamException;
